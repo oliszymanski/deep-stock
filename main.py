@@ -17,6 +17,14 @@ from keras import Sequential
 from keras.layers import LSTM, Dropout, LeakyReLU, Dense
 
 
+
+
+
+
+#========================================================
+#   FUNCTIONS
+#========================================================
+
 def show_data_plot( data, label : str, display_data=True ):
 
     if ( display_data ): print(label, '=', data)
@@ -29,10 +37,6 @@ def show_data_plot( data, label : str, display_data=True ):
     return None
 
 
-
-#========================================================
-#   FUNCTIONS
-#========================================================
 
 def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, display_data=True ):
 

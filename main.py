@@ -112,13 +112,13 @@ deep_stock = Sequential([
     Dense( 1, activation='sigmoid' )
 ])
 
-deep_stock.compile( optimizer='adam', metrics=['accuracy'], loss='mean_squared_error' )
-deep_stock.fit( train_input, train_target, epochs=12, batch_size=32 )
-loss = deep_stock.evaluate( test_input, test_target )
+deep_stock.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+history = deep_stock.fit( train_features, train_target ,epochs=epochs, batch_size=32, validation_data=( test_features, test_target ) )
 
-predictions = deep_stock.predict( test_input )
-predictions = predictions.reshape( -1, 1 )
-predictions = scaler.inverse_transform( predictions )
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
 
 # average_predictions = predictions.mean( axis=1 )
 # average_predictions = scaler.inverse_transform( average_predictions )

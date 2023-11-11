@@ -120,22 +120,28 @@ val_loss = history.history['val_loss']
 accuracy = history.history['accuracy']
 val_accuracy = history.history['val_accuracy']
 
-# average_predictions = predictions.mean( axis=1 )
-# average_predictions = scaler.inverse_transform( average_predictions )
+epochs = range( 1, len( loss ) + 1 )
 
-# average_predictions = scaler.inverse_transform( average_predictions )
-# print( 'average_predictions =', average_predictions )
+plt.figure(figsize=(10, 5))
 
-# print('predictions shape =', average_predictions.shape)
-# print("predictions =", average_predictions)
+plt.subplot(1, 2, 1)
+plt.plot(epochs, loss, 'b', label='Training Loss')
+plt.plot(epochs, val_loss, 'r', label='Validation Loss')
+plt.title('Training and Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
 
-train_data = np.array( scaler.inverse_transform( test_target ) )
+plt.subplot(1, 2, 2)
+plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
+plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
+plt.title('Training and Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
 
-plt.plot( train_data, label='actual data' )
-plt.title( 'price of EUR/PLN as from 2020-01-01' )
-plt.xlabel( 'Time point' )
-
-show_data_plot( predictions, 'predictions', display_data=True )
+plt.tight_layout()
+plt.show()
 
 
 if ( '__main__' == __name__ ):

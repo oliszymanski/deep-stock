@@ -74,6 +74,7 @@ def create_sequences( data, target ):
 
 look_ahead = 5
 epochs = 10
+display_training = True
 
 df = yf.download( 'EURPLN=X', start='2008-01-01', end=None )
 df = add_all_ta_features( df, 'Open', 'High', 'Low', 'Close', 'Volume', fillna=True )
@@ -120,30 +121,32 @@ val_loss = history.history['val_loss']
 accuracy = history.history['accuracy']
 val_accuracy = history.history['val_accuracy']
 
-epochs = range( 1, len( loss ) + 1 )
 
-plt.figure(figsize=(10, 5))
+if ( display_training ):
+    epochs = range( 1, len( loss ) + 1 )
 
-plt.subplot(1, 2, 1)
-plt.plot(epochs, loss, 'b', label='Training Loss')
-plt.plot(epochs, val_loss, 'r', label='Validation Loss')
-plt.title('Training and Validation Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
+    plt.figure(figsize=(10, 5))
 
-plt.subplot(1, 2, 2)
-plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
-plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
-plt.title('Training and Validation Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, loss, 'b', label='Training Loss')
+    plt.plot(epochs, val_loss, 'r', label='Validation Loss')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
 
-plt.tight_layout()
-plt.show()
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
+    plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
 
 
-if ( '__main__' == __name__ ):
-    print( f'test input \n{ test_input }' )
-    print( f'predictions:\n{ predictions }' )
+# if ( '__main__' == __name__ ):
+#     print( f'test input \n{ test_input }' )
+#     print( f'predictions:\n{ predictions }' )

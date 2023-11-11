@@ -57,15 +57,14 @@ def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, displ
 
 
 
-def create_sequences( data, lookback ):
-    input_sequences = []
-    target_sequences = []
+def create_sequences( data, target ):
+    data_seq = []
+    target_seq = []
+    for i in range( len( data ) ):
+        data_seq.append( data[ :i+1 ]  )
+        target_seq.append( target[ i ]  )
 
-    for i in range( len( data ) - lookback ):
-        input_sequences.append(  data[ i : i + lookback ]  )
-        target_sequences.append(  data[ i + lookback ]  )
-
-    return np.array( input_sequences ), np.array( target_sequences )
+    return np.array( data_seq ), np.array( target_seq )
 
 
 

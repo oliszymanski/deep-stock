@@ -72,38 +72,33 @@ def create_sequences( data, target ):
 #   MAIN
 #========================================================
 
-lookback = 30
+look_ahead = 5
+epochs = 10
 
 df = yf.download( 'EURPLN=X', start='2008-01-01', end=None )
-
 df = add_all_ta_features( df, 'Open', 'High', 'Low', 'Close', 'Volume', fillna=True )
+selected_columns = [ 'Close', 'volume_adi', 'momentum_rsi', 'trend_sma_slow' ]
+df = df[ selected_columns ]
 
-selected_columns = ['Close', 'volume_adi', 'momentum_rsi', 'trend_sma_slow']
-df = df[selected_columns]
-
-
+df[ 'FuturePrice' ] = df['Close'].shift( -look_ahead )
+df[ 'PriceChange' ] = df[ 'FuturePrice' ] - df[ 'Close' ]
+df[ 'Movement' ] = ( df['PriceChange'] > 0 ).astype( int )
 
 close_data = df[ ['Close'] ]
 
 
-train_data, test_data = train_test_split(df, test_size=0.2, shuffle=False)
-
-# show_data_plot( train_data, 'data for training', display_data=True )
-
-num_time_steps = train_data.shape[0]
-num_features = train_data.shape[1]
+features = df[ selected_columns ]
+target = df[ 'Movement' ]
 
 scaler = MinMaxScaler()
-scaler.fit(train_data)
-train_data_norm = scaler.transform(train_data)    # Normalize training and testing data
-test_data_norm = scaler.transform(test_data)
-
-train_input, train_target = create_sequences( train_data_norm, lookback )    # creating inputs and targets
-test_input, test_target = create_sequences( test_data_norm, lookback )
+scaled_features = scaler.fit_transform( features )
 
 
-print( "train_data_norm shape =", train_data_norm.shape )
-print( "test_data_norm shape =", test_data_norm.shape )
+train_features, test_features, train_target, test_target = train_test_split( scaled_features, target, test_size=0.2, shuffle=False )
+train_input, train_target = create_sequences( train_features, train_target )    # training data
+test_input, test_target = create_sequences( test_features, test_target )    # testing data
+
+train_features = train_features.reshape(train_features.shape[0], train_features.shape[1], 1)
 
 
 

@@ -103,25 +103,14 @@ train_features = train_features.reshape(train_features.shape[0], train_features.
 
 
 
-deep_stock = Sequential( [
-    LSTM(64, return_sequences=True, input_shape=(train_input.shape[1], train_input.shape[2])),
-    LeakyReLU( alpha=0.01 ),
-    LSTM( 128, return_sequences=True ),
-    LSTM( 128, return_sequences=True ),
-    LeakyReLU( alpha=0.01 ),
-    LSTM( 128, return_sequences=True ),
-    LSTM( 128, return_sequences=True ),
-    LeakyReLU( alpha=0.01 ),
-    LSTM( 128, return_sequences=True ),
-    LeakyReLU( alpha=0.01),
-    LSTM( 128, return_sequences=True ),
-    LeakyReLU( alpha=0.01 ),
+deep_stock = Sequential([
+    Input( shape=( train_features.shape[1], train_features.shape[2] ) ),
+    LSTM( 64, return_sequences=True ),
+    LSTM( 64 ),
     Dropout( 0.2 ),
-    LSTM( 128, return_sequences=False ),
-    LeakyReLU( alpha=0.01 ),
-    Dense( 1 )
-], name="deep_stock" )
-
+    Dense( 32, activation='relu' ),
+    Dense( 1, activation='sigmoid' )
+])
 
 deep_stock.compile( optimizer='adam', metrics=['accuracy'], loss='mean_squared_error' )
 deep_stock.fit( train_input, train_target, epochs=12, batch_size=32 )

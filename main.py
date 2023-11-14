@@ -14,7 +14,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 from keras import Sequential
-from keras.layers import LSTM, Dropout, LeakyReLU, Dense
+from keras.layers import Input, LSTM, Dropout, Dense
 
 
 
@@ -28,7 +28,7 @@ def show_data_plot( data, label : str, display_data=True ):
 
     plt.plot( data, label=label )
     plt.legend()
-    plt.grid(True)
+    plt.grid( True )
     plt.show()
 
     return None
@@ -73,7 +73,7 @@ def create_sequences( data, target ):
 #========================================================
 
 look_ahead = 5
-epochs = 10
+epochs = 100
 display_training = True
 
 df = yf.download( 'EURPLN=X', start='2008-01-01', end=None )
@@ -91,15 +91,16 @@ close_data = df[ ['Close'] ]
 features = df[ selected_columns ]
 target = df[ 'Movement' ]
 
+train_features, test_features, train_target, test_target = train_test_split(features, target, test_size=0.2, shuffle=False)
+
 scaler = MinMaxScaler()
-scaled_features = scaler.fit_transform( features )
+scaled_features = scaler.fit_transform( train_features )
 
+train_features_scaled = scaler.transform( train_features )
+test_features_scaled = scaler.transform( test_features )
 
-train_features, test_features, train_target, test_target = train_test_split( scaled_features, target, test_size=0.2, shuffle=False )
-train_input, train_target = create_sequences( train_features, train_target )    # training data
-test_input, test_target = create_sequences( test_features, test_target )    # testing data
-
-train_features = train_features.reshape(train_features.shape[0], train_features.shape[1], 1)
+train_features_reshaped = train_features_scaled.reshape(train_features_scaled.shape[0], train_features_scaled.shape[1], 1)
+test_features_reshaped = test_features_scaled.reshape(test_features_scaled.shape[0], test_features_scaled.shape[1], 1)
 
 
 
@@ -147,6 +148,24 @@ if ( display_training ):
     plt.show()
 
 
-# if ( '__main__' == __name__ ):
-#     print( f'test input \n{ test_input }' )
-#     print( f'predictions:\n{ predictions }' )
+if ( '__main__' == __name__ ):
+    predictions = my_model.predict(test_features_reshaped)
+
+    transformed_predictions = np.repeat(predictions, 4, axis=1)
+    transformed_predictions = scaler.transform(transformed_predictions)
+
+    reshaped_predictions = transformed_predictions.reshape(-1, 4)
+    predictions_inverse = scaler.inverse_transform(reshaped_predictions)
+
+    print( f'inverse transformation predicitons:\n{ predictions_inverse }' )
+    print( f'inverse transformation values:\n{ test_features_scaled }' )
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(test_target.index, test_target, label='Actual Values', color='blue')
+    plt.plot(test_target.index, predictions_inverse, label='Forecasted Values', color='red')
+    plt.title('Actual vs Forecasted Values')
+    plt.xlabel('Time/Sequence')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.show()

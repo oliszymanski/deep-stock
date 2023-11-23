@@ -8,8 +8,6 @@ import pandas as pd
 
 import yfinance as yf
 
-from ta import add_all_ta_features
-
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
@@ -160,3 +158,6 @@ predicted_values = scaler.inverse_transform( predicted_values )
 plt.plot(X_test_reg_2d, label='Actual Values')
 plt.legend()
 plt.show()
+
+
+

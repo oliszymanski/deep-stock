@@ -150,6 +150,12 @@ regression_model = Sequential([
 regression_model.compile( optimizer='adam', loss='mean_squared_error', metrics=[ 'accuracy' ] )
 regression_model.fit(X_train_reg, y_train_reg, epochs=10, batch_size=32, validation_data=(X_test_reg, y_test_reg))
 
+predicted_values = regression_model.predict( X_test_reg )
+
+X_test_reg_2d = X_test_reg.reshape(-1, 1) if len(X_test_reg.shape) == 1 else X_test_reg
+
+predicted_values = predicted_values.reshape(-1, 1)
+predicted_values = scaler.inverse_transform(predicted_values)
 
 
 # deep_stock.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])

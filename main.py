@@ -73,99 +73,137 @@ def create_sequences( data, target ):
 #========================================================
 
 look_ahead = 5
-epochs = 100
-display_training = True
+epochs = 10
 
-df = yf.download( 'EURPLN=X', start='2008-01-01', end=None )
-df = add_all_ta_features( df, 'Open', 'High', 'Low', 'Close', 'Volume', fillna=True )
-selected_columns = [ 'Close', 'volume_adi', 'momentum_rsi', 'trend_sma_slow' ]
-df = df[ selected_columns ]
-
-df[ 'FuturePrice' ] = df['Close'].shift( -look_ahead )
-df[ 'PriceChange' ] = df[ 'FuturePrice' ] - df[ 'Close' ]
-df[ 'Movement' ] = ( df['PriceChange'] > 0 ).astype( int )
-
-close_data = df[ ['Close'] ]
-
-
-features = df[ selected_columns ]
-target = df[ 'Movement' ]
-
-train_features, test_features, train_target, test_target = train_test_split(features, target, test_size=0.2, shuffle=False)
+display_training = False
+display_results = False
 
 scaler = MinMaxScaler()
-scaled_features = scaler.fit_transform( train_features )
 
-train_features_scaled = scaler.transform( train_features )
-test_features_scaled = scaler.transform( test_features )
-
-train_features_reshaped = train_features_scaled.reshape(train_features_scaled.shape[0], train_features_scaled.shape[1], 1)
-test_features_reshaped = test_features_scaled.reshape(test_features_scaled.shape[0], test_features_scaled.shape[1], 1)
+df = yf.download( 'EURPLN=X', start='2008-01-01', end=None )
+df = df[ [ 'Close' ] ]
 
 
+df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
+df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
+df = df.dropna()
+
+scaled_data = scaler.fit_transform( df )
+X_class = scaled_data[ :, 0 ]       # close price
+y_class = scaled_data[ :, 2 ]       # direction (binary target)
+
+X_class = X_class.reshape( -1, 1, 1 )
+
+X_train_class, X_test_class, y_train_class, y_test_class = train_test_split( X_class, y_class, test_size=0.2, random_state=42 )
 
 
-deep_stock = Sequential([
-    Input( shape=( train_features.shape[1], train_features.shape[2] ) ),
+print( f'scaled data:\n{ scaled_data }' )
+
+
+binary_model = Sequential([
+    Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
     LSTM( 64, return_sequences=True ),
     LSTM( 64 ),
-    Dropout( 0.2 ),
-    Dense( 32, activation='relu' ),
+    Dense( 64, activation='relu' ),
     Dense( 1, activation='sigmoid' )
+], name='binary_model')
+
+
+binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
+binary_model.fit(X_train_class, y_train_class, epochs=10, batch_size=32, validation_data=(X_test_class, y_test_class))
+
+
+direction_preds = binary_model.predict( X_class )
+direction_preds = np.round( direction_preds )
+df['PredictedDirection'] = direction_preds
+
+print( f'direction_preds:\n{ direction_preds }' )
+print( f'Dataframe:\n{ df }' )
+
+
+plt.plot( df.index, df[ 'Direction' ], label='actual direction', marker='o' )
+plt.plot( df.index, direction_preds, label='Predicted direction', marker='x', linestyle='--' )
+plt.title('Binary Classification: Actual vs Predicted Directions')
+plt.xlabel('Time/Sequence')
+plt.ylabel('Direction (0: Down, 1: Up)')
+plt.legend()
+plt.show()
+
+
+
+X_reg = df[ ['Close', 'PredictedDirection'] ].values
+y_reg = scaled_data[ :, 1 ]     # target: FutureClose
+
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X_reg, y_reg, test_size=0.2, random_state=42)
+
+print( f'X_reg\n{ X_reg }' )
+print( f'y_reg\n{ y_reg }' )
+
+
+regression_model = Sequential([
+    Input( shape=( X_train_reg.shape[1], ) ),
+    Dense( 64, activation='relu' ),
+    Dense( 32, activation='relu' ),
+    Dense( 1 )
 ])
 
-deep_stock.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-history = deep_stock.fit( train_features, train_target ,epochs=epochs, batch_size=32, validation_data=( test_features, test_target ) )
-
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-accuracy = history.history['accuracy']
-val_accuracy = history.history['val_accuracy']
+regression_model.compile( optimizer='adam', loss='mean_squared_error', metrics=[ 'accuracy' ] )
+regression_model.fit(X_train_reg, y_train_reg, epochs=10, batch_size=32, validation_data=(X_test_reg, y_test_reg))
 
 
-if ( display_training ):
-    epochs = range( 1, len( loss ) + 1 )
 
-    plt.figure(figsize=(10, 5))
+# deep_stock.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# history = deep_stock.fit( train_features, train_target ,epochs=epochs, batch_size=32, validation_data=( test_features, test_target ) )
 
-    plt.subplot(1, 2, 1)
-    plt.plot(epochs, loss, 'b', label='Training Loss')
-    plt.plot(epochs, val_loss, 'r', label='Validation Loss')
-    plt.title('Training and Validation Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-
-    plt.subplot(1, 2, 2)
-    plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
-    plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
-    plt.title('Training and Validation Accuracy')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
+# loss = history.history['loss']
+# val_loss = history.history['val_loss']
+# accuracy = history.history['accuracy']
+# val_accuracy = history.history['val_accuracy']
 
 
-if ( '__main__' == __name__ ):
-    predictions = my_model.predict(test_features_reshaped)
+# if ( display_training ):
+#     epochs = range( 1, len( loss ) + 1 )
 
-    transformed_predictions = np.repeat(predictions, 4, axis=1)
-    transformed_predictions = scaler.transform(transformed_predictions)
+#     plt.figure(figsize=(10, 5))
 
-    reshaped_predictions = transformed_predictions.reshape(-1, 4)
-    predictions_inverse = scaler.inverse_transform(reshaped_predictions)
+#     plt.subplot(1, 2, 1)
+#     plt.plot(epochs, loss, 'b', label='Training Loss')
+#     plt.plot(epochs, val_loss, 'r', label='Validation Loss')
+#     plt.title('Training and Validation Loss')
+#     plt.xlabel('Epochs')
+#     plt.ylabel('Loss')
+#     plt.legend()
 
-    print( f'inverse transformation predicitons:\n{ predictions_inverse }' )
-    print( f'inverse transformation values:\n{ test_features_scaled }' )
+#     plt.subplot(1, 2, 2)
+#     plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
+#     plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
+#     plt.title('Training and Validation Accuracy')
+#     plt.xlabel('Epochs')
+#     plt.ylabel('Accuracy')
+#     plt.legend()
 
-    plt.figure(figsize=(10, 6))
+#     plt.tight_layout()
+#     plt.show()
 
-    plt.plot(test_target.index, test_target, label='Actual Values', color='blue')
-    plt.plot(test_target.index, predictions_inverse, label='Forecasted Values', color='red')
-    plt.title('Actual vs Forecasted Values')
-    plt.xlabel('Time/Sequence')
-    plt.ylabel('Value')
-    plt.legend()
-    plt.show()
+
+# if ( '__main__' == __name__ ):
+#     predictions = my_model.predict(test_features_reshaped)
+
+#     transformed_predictions = np.repeat(predictions, 4, axis=1)
+#     transformed_predictions = scaler.transform(transformed_predictions)
+
+#     reshaped_predictions = transformed_predictions.reshape(-1, 4)
+#     predictions_inverse = scaler.inverse_transform(reshaped_predictions)
+
+#     print( f'inverse transformation predicitons:\n{ predictions_inverse }' )
+#     print( f'inverse transformation values:\n{ test_features_scaled }' )
+
+#     plt.figure(figsize=(10, 6))
+
+#     plt.plot(test_target.index, test_target, label='Actual Values', color='blue')
+#     plt.plot(test_target.index, predictions_inverse, label='Forecasted Values', color='red')
+#     plt.title('Actual vs Forecasted Values')
+#     plt.xlabel('Time/Sequence')
+#     plt.ylabel('Value')
+#     plt.legend()
+#     plt.show()

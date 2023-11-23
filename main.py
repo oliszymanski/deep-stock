@@ -148,68 +148,15 @@ regression_model = Sequential([
 ])
 
 regression_model.compile( optimizer='adam', loss='mean_squared_error', metrics=[ 'accuracy' ] )
-regression_model.fit(X_train_reg, y_train_reg, epochs=10, batch_size=32, validation_data=(X_test_reg, y_test_reg))
+regression_model.fit( X_train_reg, y_train_reg, epochs=10, batch_size=32, validation_data=( X_test_reg, y_test_reg ) )
 
 predicted_values = regression_model.predict( X_test_reg )
 
-X_test_reg_2d = X_test_reg.reshape(-1, 1) if len(X_test_reg.shape) == 1 else X_test_reg
+X_test_reg_2d = X_test_reg.reshape( -1, 1 ) if len( X_test_reg.shape ) == 1 else X_test_reg
 
-predicted_values = predicted_values.reshape(-1, 1)
-predicted_values = scaler.inverse_transform(predicted_values)
+predicted_values = predicted_values.reshape( -1, 1 )
+predicted_values = scaler.inverse_transform( predicted_values )
 
-
-# deep_stock.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-# history = deep_stock.fit( train_features, train_target ,epochs=epochs, batch_size=32, validation_data=( test_features, test_target ) )
-
-# loss = history.history['loss']
-# val_loss = history.history['val_loss']
-# accuracy = history.history['accuracy']
-# val_accuracy = history.history['val_accuracy']
-
-
-# if ( display_training ):
-#     epochs = range( 1, len( loss ) + 1 )
-
-#     plt.figure(figsize=(10, 5))
-
-#     plt.subplot(1, 2, 1)
-#     plt.plot(epochs, loss, 'b', label='Training Loss')
-#     plt.plot(epochs, val_loss, 'r', label='Validation Loss')
-#     plt.title('Training and Validation Loss')
-#     plt.xlabel('Epochs')
-#     plt.ylabel('Loss')
-#     plt.legend()
-
-#     plt.subplot(1, 2, 2)
-#     plt.plot(epochs, accuracy, 'b', label='Training Accuracy')
-#     plt.plot(epochs, val_accuracy, 'r', label='Validation Accuracy')
-#     plt.title('Training and Validation Accuracy')
-#     plt.xlabel('Epochs')
-#     plt.ylabel('Accuracy')
-#     plt.legend()
-
-#     plt.tight_layout()
-#     plt.show()
-
-
-# if ( '__main__' == __name__ ):
-#     predictions = my_model.predict(test_features_reshaped)
-
-#     transformed_predictions = np.repeat(predictions, 4, axis=1)
-#     transformed_predictions = scaler.transform(transformed_predictions)
-
-#     reshaped_predictions = transformed_predictions.reshape(-1, 4)
-#     predictions_inverse = scaler.inverse_transform(reshaped_predictions)
-
-#     print( f'inverse transformation predicitons:\n{ predictions_inverse }' )
-#     print( f'inverse transformation values:\n{ test_features_scaled }' )
-
-#     plt.figure(figsize=(10, 6))
-
-#     plt.plot(test_target.index, test_target, label='Actual Values', color='blue')
-#     plt.plot(test_target.index, predictions_inverse, label='Forecasted Values', color='red')
-#     plt.title('Actual vs Forecasted Values')
-#     plt.xlabel('Time/Sequence')
-#     plt.ylabel('Value')
-#     plt.legend()
-#     plt.show()
+plt.plot(X_test_reg_2d, label='Actual Values')
+plt.legend()
+plt.show()

@@ -145,19 +145,22 @@ regression_model = Sequential([
     Dense( 1 )
 ])
 
-regression_model.compile( optimizer='adam', loss='mean_squared_error', metrics=[ 'accuracy' ] )
-regression_model.fit( X_train_reg, y_train_reg, epochs=10, batch_size=32, validation_data=( X_test_reg, y_test_reg ) )
+binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
+binary_model.fit(X_train_class, y_train_class, epochs=150, batch_size=32, validation_data=(X_test_class, y_test_class))
 
-predicted_values = regression_model.predict( X_test_reg )
 
-X_test_reg_2d = X_test_reg.reshape( -1, 1 ) if len( X_test_reg.shape ) == 1 else X_test_reg
+direction_preds = binary_model.predict( X_class )
+direction_preds = np.round( direction_preds )
+df['PredictedDirection'] = direction_preds
 
-predicted_values = predicted_values.reshape( -1, 1 )
-predicted_values = scaler.inverse_transform( predicted_values )
-
-plt.plot(X_test_reg_2d, label='Actual Values')
+plt.plot( df.index[ -100: ], direction_preds[ -100: ], label='Predicted direction', marker='x', linestyle='--' )
+plt.plot( df.index[ -100: ], df[ 'Direction' ].tail( 100 ), label='actual direction', marker='o' )
+plt.title('Binary Classification: Actual vs Predicted Directions')
+plt.xlabel('Time/Sequence')
+plt.ylabel('Direction (0: Down, 1: Up)')
 plt.legend()
 plt.show()
 
-
+print( f'direction_preds:\n{ direction_preds }' )
+print( f'Dataframe:\n{ df }' )
 

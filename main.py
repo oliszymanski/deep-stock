@@ -138,12 +138,13 @@ print( f'X_reg\n{ X_reg }' )
 print( f'y_reg\n{ y_reg }' )
 
 
-regression_model = Sequential([
-    Input( shape=( X_train_reg.shape[1], ) ),
+binary_model = Sequential([
+    Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
+    LSTM( 128, return_sequences=True ),
+    LSTM( 64 ),
     Dense( 64, activation='relu' ),
-    Dense( 32, activation='relu' ),
-    Dense( 1 )
-])
+    Dense( 1, activation='sigmoid' )
+], name='binary_model')
 
 binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
 binary_model.fit(X_train_class, y_train_class, epochs=150, batch_size=32, validation_data=(X_test_class, y_test_class))

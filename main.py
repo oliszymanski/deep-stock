@@ -138,7 +138,7 @@ binary_model = Sequential([
 binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
 history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
 
-display_diagnostics( epochs, history )
+display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
 
 y_out = binary_model.predict( X_test_class )
 y_pred_bin = ( y_out > 0.5 ).astype( int )

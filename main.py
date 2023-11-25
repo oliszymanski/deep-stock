@@ -66,6 +66,33 @@ def create_sequences( data, target ):
 
 
 
+def display_diagnostics( epoch_count, history ):
+    for epoch in range(0, epoch_count, epoch_count):
+        plt.figure(figsize=(10, 5))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(history.history['accuracy'], label='Training Accuracy')
+        plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+        plt.title('Training and Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(history.history['loss'], label='Training Loss')
+        plt.plot(history.history['val_loss'], label='Validation Loss')
+        plt.title('Training and Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+
+        plt.tight_layout()
+        plt.show()
+
+    return
+
+
+
 #========================================================
 #   MAIN
 #========================================================

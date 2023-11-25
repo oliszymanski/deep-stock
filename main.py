@@ -138,19 +138,16 @@ binary_model = Sequential([
 binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
 history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
 
+display_diagnostics( epochs, history )
 
-direction_preds = binary_model.predict( X_class )
-direction_preds = np.round( direction_preds )
-df['PredictedDirection'] = direction_preds
+y_out = binary_model.predict( X_test_class )
+y_pred_bin = ( y_out > 0.5 ).astype( int )
 
-plt.plot( df.index[ -100: ], direction_preds[ -100: ], label='Predicted direction', marker='x', linestyle='--' )
-plt.plot( df.index[ -100: ], df[ 'Direction' ].tail( 100 ), label='actual direction', marker='o' )
-plt.title('Binary Classification: Actual vs Predicted Directions')
-plt.xlabel('Time/Sequence')
-plt.ylabel('Direction (0: Down, 1: Up)')
+print( f'y_out:\n{ y_out }' )
+print( f'preds_bin:\n{ y_pred_bin }' )
+
+
+plt.plot( y_pred_bin[ -50: ], label='predicted (binary)', color='blue', linestyle='--' )
+plt.plot( y_test_class[ -50: ], label='actual values (binary)', color='red' )
 plt.legend()
 plt.show()
-
-print( f'direction_preds:\n{ direction_preds }' )
-print( f'Dataframe:\n{ df }' )
-

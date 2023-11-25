@@ -85,7 +85,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.legend()
-	plt.savefig( save_path )
+        plt.savefig( save_path )
         plt.tight_layout()
         plt.show()
 

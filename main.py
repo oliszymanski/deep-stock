@@ -98,7 +98,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 #========================================================
 
 look_ahead = 5
-epochs = 500
+epochs = 1000
 
 display_training = False
 display_results = False

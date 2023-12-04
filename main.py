@@ -105,7 +105,7 @@ display_results = False
 
 scaler = MinMaxScaler()
 
-df = yf.download( 'EURPLN=X', start=None, end=None )
+df = yf.download( 'EURPLN=X', end="2030-01-01" )
 df = df[ [ 'Close' ] ]
 
 

@@ -108,7 +108,7 @@ scaler = MinMaxScaler()
 df = yf.download( 'EURPLN=X', end="2030-01-01" )
 df = df[ [ 'Close' ] ]
 
-if (__main__ == '__name__'):
+if (__name__ == '__main__'):
 	df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
 	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
 	df = df.dropna()

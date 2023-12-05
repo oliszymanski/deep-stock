@@ -98,7 +98,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 #========================================================
 
 look_ahead = 5
-epochs = 1000
+epochs = 10000
 
 display_training = False
 display_results = False
@@ -108,47 +108,49 @@ scaler = MinMaxScaler()
 df = yf.download( 'EURPLN=X', end="2030-01-01" )
 df = df[ [ 'Close' ] ]
 
+if (__main__ == '__name__'):
+	df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
+	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
+	df = df.dropna()
 
-df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
-df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
-df = df.dropna()
+	X_class = df[ ['Close'] ].values        # actual values
+	y_class = df[ 'Direction' ].values      # binary value (1: stock up, 0: stock down)
 
-X_class = df[ ['Close'] ].values        # actual values
-y_class = df[ 'Direction' ].values      # binary value (1: stock up, 0: stock down)
-
-print( f'X_class:\n{ X_class }' )
-print( f'y_class:\n{ y_class }' )
-
-
-X_class_scaled = scaler.fit_transform( X_class )
-X_class_reshaped = X_class_scaled.reshape( -1, 1, 1 )
-
-X_train_class, X_test_class, y_train_class, y_test_class = train_test_split( X_class_reshaped, y_class, test_size=0.2, random_state=42 )
+	print( f'X_class:\n{ X_class }' )
+	print( f'y_class:\n{ y_class }' )
 
 
-binary_model = Sequential([
-    Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
-    LSTM( 128, return_sequences=True ),
-    LSTM( 64 ),
-    Dense( 64, activation='relu' ),
-    Dense( 1, activation='sigmoid' )
-])
+	X_class_scaled = scaler.fit_transform( X_class )
+	X_class_reshaped = X_class_scaled.reshape( -1, 1, 1 )
+
+	X_train_class, X_test_class, y_train_class, y_test_class = train_test_split( X_class_reshaped, y_class, test_size=0.2, random_state=42 )
 
 
-binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
-history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
-
-display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
-
-y_out = binary_model.predict( X_test_class )
-y_pred_bin = ( y_out > 0.5 ).astype( int )
-
-print( f'y_out:\n{ y_out }' )
-print( f'preds_bin:\n{ y_pred_bin }' )
+	binary_model = Sequential([
+	    Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
+	    LSTM( 128, return_sequences=True ),
+	    LSTM( 64 ),
+	    Dense( 64, activation='relu' ),
+	    Dense( 1, activation='sigmoid' )
+	])
 
 
-plt.plot( y_pred_bin[ -50: ], label='predicted (binary)', color='blue', linestyle='--' )
-plt.plot( y_test_class[ -50: ], label='actual values (binary)', color='red' )
-plt.legend()
-plt.savefig('./img/testing_plot.png')
-plt.show()
+	binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
+	history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
+	binary_model.save( './models/bin_model.h5' )
+	display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
+	
+
+	y_out = binary_model.predict( X_test_class )
+	y_pred_bin = ( y_out > 0.5 ).astype( int )
+
+	print( f'y_out:\n{ y_out }' )
+	print( f'preds_bin:\n{ y_pred_bin }' )
+
+
+	plt.plot( y_pred_bin[ -50: ], label='predicted (binary)', color='blue', linestyle='--' )
+	plt.plot( y_test_class[ -50: ], label='actual values (binary)', color='red' )
+	plt.legend()
+	plt.savefig('./img/testing_plot.png')
+	plt.show()
+

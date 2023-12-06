@@ -98,14 +98,14 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 #========================================================
 
 look_ahead = 5
-epochs = 10000
+epochs = 1000
 
 display_training = False
 display_results = False
 
 scaler = MinMaxScaler()
 
-df = yf.download( 'EURPLN=X', end="2030-01-01" )
+df = yf.download( 'GBPPLN=X', end="2030-01-01" )
 df = df[ [ 'Close' ] ]
 
 if (__name__ == '__main__'):

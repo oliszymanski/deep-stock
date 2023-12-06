@@ -15,6 +15,7 @@ from keras.models import load_model
 import main
 
 
+
 #===========================================================
 #	FUNCTIONS
 #===========================================================
@@ -25,7 +26,7 @@ def get_column_data( df, val_00 : str , val_01 : str ):
 
 
 def simulator( model, df, initial_balance : float, look_ahead : int ):
-	
+
 	X, y = get_column_data( df, 'Close', 'Direction' )
 	future_prices = []
 
@@ -44,18 +45,18 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 		prediction = y[i]
 
 		if ( prediction == 1 ):		# if price is going to go high
-			buy_amount = 0.2 * cash_balance
+			buy_amount = 1.0 * cash_balance
 			foreign_currency_balance += buy_amount / current_price
 			cash_balance -= buy_amount
 
 		elif ( prediction == 0 ):
-			sell_amount = 0.2 * foreign_currency_balance
+			sell_amount = 1.0 * foreign_currency_balance
 			cash_balance += sell_amount * current_price
 			foreign_currency_balance -= sell_amount
 
 	gains = cash_balance + ( foreign_currency_balance * current_price )
 	print( f'gains: \n{ gains }' )
-	print( f'gains: \n{ gains - cash_balance }' )
+	print( f'gains: \n{ gains - initial_balance }' )
 
 	return gains
 
@@ -66,7 +67,7 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 #	MAIN
 #==========================================================
 
-df = yf.download( 'EURPLN=X', end='2030-01-01' )
+df = yf.download( 'GBPPLN=X', end='2030-01-01' )
 df = df[ [ 'Close' ] ]
 df[ 'FutureClose' ] = df[ 'Close' ].shift(-5)
 df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
@@ -74,7 +75,7 @@ df.dropna()
 
 df.index = pd.to_datetime( df.index )
 end_date = df.index.max()
-start_date = end_date - pd.DateOffset( months=6 )
+start_date = end_date - pd.DateOffset( months=3 )
 df = df.loc[ start_date : end_date ]
 
 if ( __name__ == '__main__' ):
@@ -82,55 +83,3 @@ if ( __name__ == '__main__' ):
 	print(f'df:\n{ df }')
 
 	sim_gains = simulator( bin_model, df, 1000.0, 5 )
-	print( f'gains from simulation: \n{ sim_gains }' )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

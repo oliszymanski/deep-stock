@@ -62,12 +62,11 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 
 
 
-
 #==========================================================
 #	MAIN
 #==========================================================
 
-df = yf.download( 'GBPPLN=X', end='2030-01-01' )
+df = yf.download( 'EURPLN=X', end='2030-01-01' )
 df = df[ [ 'Close' ] ]
 df[ 'FutureClose' ] = df[ 'Close' ].shift(-5)
 df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
@@ -75,7 +74,7 @@ df.dropna()
 
 df.index = pd.to_datetime( df.index )
 end_date = df.index.max()
-start_date = end_date - pd.DateOffset( months=3 )
+start_date = end_date - pd.DateOffset( months=24 )
 df = df.loc[ start_date : end_date ]
 
 if ( __name__ == '__main__' ):

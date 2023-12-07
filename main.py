@@ -105,7 +105,7 @@ display_results = False
 
 scaler = MinMaxScaler()
 
-df = yf.download( 'GBPPLN=X', end="2030-01-01" )
+df = yf.download( 'EURPLN=X', end="2021-01-01" )
 df = df[ [ 'Close' ] ]
 
 if (__name__ == '__main__'):
@@ -139,7 +139,7 @@ if (__name__ == '__main__'):
 	history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
 	binary_model.save( './models/bin_model.h5' )
 	display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
-	
+
 
 	y_out = binary_model.predict( X_test_class )
 	y_pred_bin = ( y_out > 0.5 ).astype( int )
@@ -153,4 +153,3 @@ if (__name__ == '__main__'):
 	plt.legend()
 	plt.savefig('./img/testing_plot.png')
 	plt.show()
-

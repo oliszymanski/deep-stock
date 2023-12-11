@@ -119,7 +119,6 @@ if (__name__ == '__main__'):
 	print( f'X_class:\n{ X_class }' )
 	print( f'y_class:\n{ y_class }' )
 
-
 	X_class_scaled = scaler.fit_transform( X_class )
 	X_class_reshaped = X_class_scaled.reshape( -1, 1, 1 )
 

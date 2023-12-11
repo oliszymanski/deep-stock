@@ -92,6 +92,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
     return
 
 
+
 def train_model( df, scaler, look_ahead : int ):
 	"""
 	"""
@@ -122,6 +123,20 @@ def train_model( df, scaler, look_ahead : int ):
 	display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
 
 	return binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
+
+
+
+def test_gains( cycles : int )
+	"""
+	:param cycle:		
+	:param:			
+
+
+
+	"""
+
+
+	return
 
 
 

@@ -55,7 +55,7 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 			foreign_currency_balance -= sell_amount
 
 	gains = cash_balance + ( foreign_currency_balance * current_price )
-	print( f'gains: \n{ gains }' )
+	print( f'balance after trading: \n{ gains }' )
 	print( f'gains: \n{ gains - initial_balance }' )
 
 	return gains

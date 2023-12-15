@@ -13,6 +13,7 @@ import pandas as pd
 from keras.models import load_model
 
 import main
+from main import train_model
 
 
 
@@ -59,6 +60,26 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 	print( f'gains: \n{ gains - initial_balance }' )
 
 	return gains
+
+
+
+def test_gains( df, cycles : int, step : int, view_results=True ):
+
+	ls_final_balances = []
+
+	"""
+	while start_date <= end_date:
+		train model with the data up to start_date index
+		simulate gains on the rest of df
+		append gains into ls_final_balances
+		start the cycle again
+	"""
+
+
+	if ( view_results ):
+		print( 'final results' )
+
+	return None
 
 
 

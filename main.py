@@ -94,6 +94,10 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 
 def train_model( df, scaler, look_ahead : int ):
 	"""
+	:param scaler:		for scaling data,
+	:param look_ahead:	looking some points into the future
+
+	returns:		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
 	"""
 
 	df = df[ ['Close'] ]

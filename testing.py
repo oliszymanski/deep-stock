@@ -10,7 +10,7 @@ from main import train_model
 import simulator
 from simulator import simulator
 
-import yfinance
+import yfinance as yf
 
 import pandas as pd
 import numpy as np
@@ -26,7 +26,8 @@ from sklearn.preprocessing import MinMaxScaler
 def get_analyzed_df( df ):
 
 	df = df[ ['Close'] ]
-	df[ 'FutureClose' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
+	df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
+	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
 	df = df.dropna()
 
 	df.index = pd.to_datetime( df.index )
@@ -75,12 +76,13 @@ def test_gains( df, start_date, steps: int ):
 		sub_df = df[ df.index <= current_date ] # setting a datarange
 
 		# model training
-		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train( sub_df, scaler, 5 )
+		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
 
 		# run model simulation
-		simulator( binary_model, sub_df, 10000.0, 5 )
+		cycle_gain = simulator( binary_model, sub_df, 10000.0, 5 )
+		ls_final_balance.append( cycle_gain )
 
-		# add balance to ls_final_balances date
+		# go to new date
 		current_date += add_months( current_date, steps )
 
 

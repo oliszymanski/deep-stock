@@ -11,4 +11,4 @@ currency exchange simulator in Python using machine learning for automated tradi
 ## Model diagnostics
 
 
-## Notes
+## Additional notes

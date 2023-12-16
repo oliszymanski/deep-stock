@@ -1,0 +1,33 @@
+#========================================================
+#	IMPORTS
+#========================================================
+
+import main
+import simulator
+
+from main import train_model
+
+import yfinanse as yf
+
+
+
+#========================================================
+#   	FUNCTIONS
+#========================================================
+
+def test_gains( df, cycles: int, step: int, view_results=True )
+
+	ls_final_balances = []
+
+
+	if ( view_results ):
+		print( f'final balances: {}' )
+
+	return None
+
+
+
+
+#========================================================
+#	MAIN
+#========================================================

@@ -73,7 +73,8 @@ def test_gains( df, start_date, steps: int ):
 
 	while ( current_date <= end_date ):
 
-		sub_df = df[ df.index <= current_date ] # setting a datarange
+		sub_df = df[ df.index <= current_date ] 	# setting a data range
+		# test_range_df = 
 
 		# model training
 		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )

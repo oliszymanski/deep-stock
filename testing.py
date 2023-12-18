@@ -3,6 +3,7 @@
 #========================================================
 
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 import main
 from main import train_model
@@ -63,28 +64,20 @@ def test_gains( df, start_date, steps: int ):
 
 	current_date = start_date
 
-	"""
-        while start_date <= end_date:
-                train model with the data up to start_date index
-                simulate gains on the rest of df
-                append gains into ls_final_balances
-                start the cycle again
-	"""
-
 	while ( current_date <= end_date ):
 
 		sub_df = df[ df.index <= current_date ] 	# setting a data range
-		# test_range_df = 
+		test_range_df = df[ current_date: ]
 
 		# model training
 		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
 
 		# run model simulation
-		cycle_gain = simulator( binary_model, sub_df, 10000.0, 5 )
-		ls_final_balance.append( cycle_gain )
+		cycle_gain = simulator( binary_model, test_range_df, 10000.0, 5 )
+		ls_final_balances.append( cycle_gain )
 
 		# go to new date
-		current_date += add_months( current_date, steps )
+		current_date += relativedelta( months=steps )
 
 
 

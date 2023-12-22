@@ -48,7 +48,7 @@ def add_months( sourcedate, months ):
 
 
 
-def test_gains( df, start_date, steps: int ):
+def test_gains( df, start_date, steps: int, view_results=True ):
 
 	"""
 	:param start_date:	starting date point (turned into datetime),

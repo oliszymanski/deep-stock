@@ -56,30 +56,9 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 			foreign_currency_balance -= sell_amount
 
 	gains = cash_balance + ( foreign_currency_balance * current_price ) - initial_balance
-	print( f'balance after trading: \n{ gains }' )
-	print( f'gains: \n{ gains - initial_balance }' )
+	print( f'gains: \n{ gains }' )
 
 	return gains
-
-
-
-def test_gains( df, cycles : int, step : int, view_results=True ):
-
-	ls_final_balances = []
-
-	"""
-	while start_date <= end_date:
-		train model with the data up to start_date index
-		simulate gains on the rest of df
-		append gains into ls_final_balances
-		start the cycle again
-	"""
-
-
-	if ( view_results ):
-		print( 'final results' )
-
-	return None
 
 
 

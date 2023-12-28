@@ -157,5 +157,5 @@ if (__name__ == '__main__'):
 	plt.plot( y_pred_bin[ -50: ], label='predicted (binary)', color='blue', linestyle='--' )
 	plt.plot( y_test_class[ -50: ], label='actual values (binary)', color='red' )
 	plt.legend()
-	plt.savefig('./img/testing_plot.png')
+	plt.savefig( './img/testing_plot.png' )
 	plt.show()

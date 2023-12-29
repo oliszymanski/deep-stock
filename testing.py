@@ -54,6 +54,7 @@ def test_gains( df, start_date, steps: int, view_results=True ):
 	:param start_date:	starting date point (turned into datetime),
 	:param end_date:	end date point (datetime object),
 	:param steps:		how many months ahead to max date to go,
+	:param view_results:	final results;
 	"""
 
 	ls_final_balances = []

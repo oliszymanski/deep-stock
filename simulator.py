@@ -68,8 +68,8 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 
 df = yf.download( 'EURPLN=X', end='2030-01-01' )
 df = df[ [ 'Close' ] ]
-df[ 'FutureClose' ] = df[ 'Close' ].shift(-5)
-df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
+df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
+df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
 df.dropna()
 
 df.index = pd.to_datetime( df.index )

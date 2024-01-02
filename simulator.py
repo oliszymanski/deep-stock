@@ -22,11 +22,17 @@ from main import train_model
 #===========================================================
 
 def get_column_data( df, val_00 : str , val_01 : str ):
-	return df[ [val_00] ].values, df[ val_01 ]
+	return df[ [ val_00 ] ].values, df[ val_01 ]
 
 
 
 def simulator( model, df, initial_balance : float, look_ahead : int ):
+	"""
+	:param model:			binary classification model,
+	:param df:			pandas dataframe,
+	:param initial_balance:		initial balance to simulate with,
+	:param look_ahead:		steps to look ahead during predicition;
+	"""
 
 	X, y = get_column_data( df, 'Close', 'Direction' )
 	future_prices = []
@@ -55,10 +61,10 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 			cash_balance += sell_amount * current_price
 			foreign_currency_balance -= sell_amount
 
-	gains = cash_balance + ( foreign_currency_balance * current_price ) - initial_balance
-	print( f'gains: \n{ gains }' )
+	final_balance = cash_balance + ( foreign_currency_balance * current_price )
+	print( f'final balance: \n{ final_balance }' )
 
-	return gains
+	return final_balance
 
 
 

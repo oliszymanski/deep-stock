@@ -38,6 +38,11 @@ def get_analyzed_df( df ):
 
 
 def add_months( sourcedate, months ):
+	"""
+	:param sourcedate:	date to add months to,
+	:param months:		months to add;
+	"""
+
 	month = sourcedate.month - 1 + months
 	year = sourcedate.year + month // 12
 	month = month % 12 + 1

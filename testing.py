@@ -26,6 +26,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 def get_analyzed_df( df ):
 
+	"""
+	:param df:	dataframe to modify;
+	"""
 	df = df[ ['Close'] ]
 	df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
 	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
@@ -38,6 +41,7 @@ def get_analyzed_df( df ):
 
 
 def add_months( sourcedate, months ):
+
 	"""
 	:param sourcedate:	date to add months to,
 	:param months:		months to add;

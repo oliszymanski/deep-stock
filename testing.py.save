@@ -1,4 +1,3 @@
-
 #========================================================
 #	IMPORTS
 #========================================================
@@ -30,6 +29,7 @@ def get_analyzed_df( df ):
 	"""
 	:param df:	dataframe to modify;
 	"""
+
 	df = df[ ['Close'] ]
 	df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
 	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
@@ -99,35 +99,6 @@ def test_gains( df, start_date, steps: int, view_results=True ):
 
 
 
-def test_gains_test_00( df, steps: int, view_results=True ):
-
-	"""
-	:param df:		dataframe with other data,
-        :param steps:           how many months ahead to max date to go,
-        :param view_results:    final results;
-	"""
-
-	forecast_win = 10
-        ls_final_balances = []
-
-        start_date = df.index.min()
-        end_date = df.index.max()
-
-
-        while ( current_date <= end_date ):
-                interval_end_date = current_date + relativedelta( months=steps )
-
-                sub_df = df[ (df.index >= current_date) & (df.index <= interval_end_date) ]
-
-                forecast_date = current_date
-
-                while ( forecast_date <= interval_end_date - timedelta( days=forecast_window ) ):
-			test_range_df = df[ forecast_date: forecast_date + timedelta( days=forecast_window ) ]
-
-			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
-
-			cycle_gain = simulator( binary_model, test_range_df )
-
 
 #========================================================
 #	MAIN
@@ -140,6 +111,4 @@ start_date = datetime( 2021, 1, 1 )
 
 
 if ( __name__ == '__main__' ):
-	# test_gains( df, start_date, 3 )
-
-	test_gains_test_00( df, 3 )
+	test_gains( df, start_date, 3 )

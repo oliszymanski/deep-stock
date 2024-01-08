@@ -22,7 +22,7 @@ from main import train_model
 #===========================================================
 
 initial_balance = 1000.0
-look_ahead = 5
+look_ahead = 1
 
 df = yf.download( 'EURPLN=X', end='2030-01-01' )		# setting up the dataframe
 df = df[ [ 'Close' ] ]
@@ -47,6 +47,7 @@ def get_column_data( df, val_00 : str , val_01 : str ):
 
 
 def simulator( model, df, initial_balance : float, look_ahead : int ):
+
 	"""
 	:param model:			binary classification model,
 	:param df:			pandas dataframe,
@@ -83,6 +84,8 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 
 	final_balance = cash_balance + ( foreign_currency_balance * current_price )
 	print( f'final balance: \n{ final_balance }' )
+
+	print( f"Future prices:\n{future_prices}" )
 
 	return final_balance
 

@@ -21,6 +21,22 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 #========================================================
+#	GLOBALS
+#========================================================
+
+scaler = MinMaxScaler()
+
+df = yf.download( 'EURPLN=X', end='2030-01-01' )
+df = df[ [ 'Close' ] ]
+df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
+df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
+df.dropna()
+
+start_date = datetime( 2021, 1, 1 )
+
+
+
+#========================================================
 #	FUNCTIONS
 #========================================================
 
@@ -99,7 +115,7 @@ def test_gains( df, start_date, steps: int, view_results=True ):
 
 
 
-def test_gains_test_00( df, steps: int, view_results=True ):
+def test_quarter_forecasting( df, steps: int, view_results=True ):
 
 	"""
 	:param df:		dataframe with other data,
@@ -107,8 +123,11 @@ def test_gains_test_00( df, steps: int, view_results=True ):
         :param view_results:    final results;
 	"""
 
-	forecast_win = 10
+	forecast_win = 10			# 2 weeks without weekends = 10 days
 	ls_final_balances = []
+
+	ls_quarter_prices = []
+	ls_2_week_forecasts = []
 
 	start_date = df.index.min()
 	end_date = df.index.max()
@@ -120,6 +139,15 @@ def test_gains_test_00( df, steps: int, view_results=True ):
 		sub_df = df[ ( df.index >= current_date ) & ( df.index <= interval_end_date ) ]
 
 		forecast_date = current_date
+
+		# go +3 months
+
+		# forecast next day for 2 weeks (10 days):
+			# add forecasted next day to ls_2_week_forecasts
+			# add ls_2_week_forecasts to ls_quarter_prices
+			# reset ls_2_week_forecasts
+		# go to the next 3 months
+
 
 		while ( forecast_date <= interval_end_date - timedelta( days=forecast_win ) ):
 			test_range_df = df[ forecast_date: forecast_date + timedelta( days=forecast_win ) ]
@@ -133,8 +161,10 @@ def test_gains_test_00( df, steps: int, view_results=True ):
 
 		current_date += relativedelta( months=steps )
 
+	if ( view_results ):
+		print( f'ls_quarter_prices:\n{ ls_quarter_prices }' )
 
-	return None
+	return ls_quarter_prices
 
 
 
@@ -142,19 +172,8 @@ def test_gains_test_00( df, steps: int, view_results=True ):
 #	MAIN
 #========================================================
 
-df = yf.download( 'EURPLN=X', end='2030-01-01' )
-df = df[ [ 'Close' ] ]
-df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
-df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
-df.dropna()
-
-scaler = MinMaxScaler()
-
-start_date = datetime( 2021, 1, 1 )
-
-
 if ( __name__ == '__main__' ):
 	# test_gains( df, start_date, 3 )
 
-	tested_gains = test_gains_test_00( df, 3 )
+	tested_gains = test_quarter_forecasting( df, 3 )
 	print( f"tested gains:\n{tested_gains}" )

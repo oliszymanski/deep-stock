@@ -29,6 +29,7 @@ def get_analyzed_df( df ):
 	"""
 	:param df:	dataframe to modify;
 	"""
+
 	df = df[ ['Close'] ]
 	df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
 	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )

@@ -1,5 +1,5 @@
 #========================================================
-#   IMPORTS
+#   	IMPORTS
 #========================================================
 
 import matplotlib.pyplot as plt
@@ -16,8 +16,24 @@ from keras.layers import Input, LSTM, Dropout, Dense
 
 
 
+#=======================================================
+#	GLOBALS
+#=======================================================
+
+look_ahead = 5
+epochs = 1000
+
+display_training = False
+display_results = False
+
+scaler = MinMaxScaler()
+
+df = yf.download( 'EURPLN=X', end="2021-01-01" )
+
+
+
 #========================================================
-#   FUNCTIONS
+#   	FUNCTIONS
 #========================================================
 
 def show_data_plot( data, label : str, display_data=True ):
@@ -92,6 +108,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
     return
 
 
+
 def train_model( df, scaler, look_ahead : int ):
 	"""
 	:param scaler:		for scaling data,
@@ -133,18 +150,7 @@ def train_model( df, scaler, look_ahead : int ):
 #   MAIN
 #========================================================
 
-look_ahead = 5
-epochs = 1000
-
-display_training = False
-display_results = False
-
-scaler = MinMaxScaler()
-
-df = yf.download( 'EURPLN=X', end="2021-01-01" )
-
 if (__name__ == '__main__'):
-
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
 
 	y_out = binary_model.predict( X_test_class )

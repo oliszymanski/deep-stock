@@ -152,7 +152,8 @@ def train_model( df, scaler, look_ahead : int ):
 
 if (__name__ == '__main__'):
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
-
+	
+	print( "x_test_class =\n", X_test_class )
 	y_out = binary_model.predict( X_test_class )
 	y_pred_bin = ( y_out > 0.5 ).astype( int )
 

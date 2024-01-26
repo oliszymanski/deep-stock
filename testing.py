@@ -115,7 +115,7 @@ def test_gains( df, start_date, steps: int, view_results=True ):
 
 
 
-def test_quarter_forecasting( df, steps: int, view_results=True ):
+def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 
 	"""
 	:param df:		dataframe with other data,
@@ -129,18 +129,26 @@ def test_quarter_forecasting( df, steps: int, view_results=True ):
 	ls_quarter_prices = []
 	ls_2_week_forecasts = []
 
-	start_date = df.index.min()
 	end_date = df.index.max()
 	current_date = start_date
 
+
+	while ( current_date <= end_date ):
+		forecast_date = current_date + relativedelta( months=steps )
+		print( f'forecast_date: { forecast_date }' )
+
+		current_date = forecast_date
+
+	'''
 	while ( current_date <= end_date ):
 		interval_end_date = current_date + relativedelta( months=steps )
 
 		sub_df = df[ ( df.index >= current_date ) & ( df.index <= interval_end_date ) ]
 
 		forecast_date = current_date
-
+	'''
 		# go +3 months
+		
 
 		# forecast next day for 2 weeks (10 days):
 			# add forecasted next day to ls_2_week_forecasts
@@ -149,6 +157,7 @@ def test_quarter_forecasting( df, steps: int, view_results=True ):
 		# go to the next 3 months
 
 
+	'''
 		while ( forecast_date <= interval_end_date - timedelta( days=forecast_win ) ):
 			test_range_df = df[ forecast_date: forecast_date + timedelta( days=forecast_win ) ]
 
@@ -161,8 +170,9 @@ def test_quarter_forecasting( df, steps: int, view_results=True ):
 
 		current_date += relativedelta( months=steps )
 
-	if ( view_results ):
-		print( f'ls_quarter_prices:\n{ ls_quarter_prices }' )
+	'''
+
+	if ( view_results ): print( f'ls_quarter_prices:\n{ ls_quarter_prices }' )
 
 	return ls_quarter_prices
 
@@ -175,5 +185,5 @@ def test_quarter_forecasting( df, steps: int, view_results=True ):
 if ( __name__ == '__main__' ):
 	# test_gains( df, start_date, 3 )
 
-	tested_gains = test_quarter_forecasting( df, 3 )
+	tested_gains = test_quarter_forecasting( df,'2021-01-01', 3 )
 	print( f"tested gains:\n{tested_gains}" )

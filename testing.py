@@ -27,10 +27,13 @@ from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 
 df = yf.download( 'EURPLN=X', end='2030-01-01' )
+
+'''
 df = df[ [ 'Close' ] ]
 df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
 df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
 df.dropna()
+'''
 
 start_date = datetime( 2021, 1, 1 )
 
@@ -119,16 +122,19 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 
 	"""
 	:param df:		dataframe with other data,
+	:oaran start_date:	starting date point (turned into datetime),
         :param steps:           how many months ahead to max date to go,
         :param view_results:    final results;
 	"""
 
 	forecast_win = 10			# 2 weeks without weekends = 10 days
-	ls_final_balances = []
 
+	ls_final_balances = []
 	ls_quarter_prices = []
 	ls_2_week_forecasts = []
 
+	df = get_analyzed_df( df )
+	start_train_date = df.index.min()
 	end_date = df.index.max()
 	current_date = start_date
 
@@ -137,7 +143,47 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 		forecast_date = current_date + relativedelta( months=steps )
 		print( f'forecast_date: { forecast_date }' )
 
+		for day in range( 14 ):
+			train_date = forecast_date + relativedelta( days=day )
+			print( f'train_date: { train_date }' )
+
+			train_df = df[ start_train_date <= train_date ]
+			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
+
+
 		current_date = forecast_date
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	'''
 	while ( current_date <= end_date ):
@@ -185,5 +231,5 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 if ( __name__ == '__main__' ):
 	# test_gains( df, start_date, 3 )
 
-	tested_gains = test_quarter_forecasting( df,'2021-01-01', 3 )
+	tested_gains = test_quarter_forecasting( df, start_date, 3 )
 	print( f"tested gains:\n{tested_gains}" )

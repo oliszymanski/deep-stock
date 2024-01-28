@@ -127,9 +127,6 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
         :param view_results:    final results;
 	"""
 
-	forecast_win = 10			# 2 weeks without weekends = 10 days
-
-	ls_final_balances = []
 	ls_quarter_prices = []
 	ls_2_week_forecasts = []
 
@@ -147,76 +144,15 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 			train_date = forecast_date + relativedelta( days=day )
 			print( f'train_date: { train_date }' )
 
-			train_df = df[ start_train_date <= train_date ]
-			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
+			train_df = df.loc[ :train_date ]
+			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( train_df, scaler, 5 )
 
+			pred_next_day = binary_model.predict( train_date + relativedelta( days=1 ) )
+			ls_2_week_forecasts.append( pred_next_day )
 
+		ls_quarter_prices.append( ls_2_week_forecasts )
 		current_date = forecast_date
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	'''
-	while ( current_date <= end_date ):
-		interval_end_date = current_date + relativedelta( months=steps )
-
-		sub_df = df[ ( df.index >= current_date ) & ( df.index <= interval_end_date ) ]
-
-		forecast_date = current_date
-	'''
-		# go +3 months
-		
-
-		# forecast next day for 2 weeks (10 days):
-			# add forecasted next day to ls_2_week_forecasts
-			# add ls_2_week_forecasts to ls_quarter_prices
-			# reset ls_2_week_forecasts
-		# go to the next 3 months
-
-
-	'''
-		while ( forecast_date <= interval_end_date - timedelta( days=forecast_win ) ):
-			test_range_df = df[ forecast_date: forecast_date + timedelta( days=forecast_win ) ]
-
-			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( sub_df, scaler, 5 )
-
-			cycle_gain = simulator( binary_model, test_range_df, 1000, 1 )
-			ls_final_balances.append( cycle_gain )
-
-			forecast_date += timedelta( days=1 )
-
-		current_date += relativedelta( months=steps )
-
-	'''
 
 	if ( view_results ): print( f'ls_quarter_prices:\n{ ls_quarter_prices }' )
 

@@ -130,15 +130,22 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 	ls_quarter_prices = []
 	ls_2_week_forecasts = []
 
-	df = get_analyzed_df( df )
+	ls_final_balance = []
+	ls_balances = []
+
+	df = get_analyzed_df( df )			# date
 	start_train_date = df.index.min()
 	end_date = df.index.max()
 	current_date = start_date
+
+	close_vals = df[ [ 'Close' ] ].values 		# values
 
 
 	while ( current_date <= end_date ):
 		forecast_date = current_date + relativedelta( months=steps )
 		print( f'forecast_date: { forecast_date }' )
+
+		initial_balance = 10000
 
 		for day in range( 14 ):
 			train_date = forecast_date + relativedelta( days=day )
@@ -147,7 +154,10 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 			train_df = df.loc[ :train_date ]
 			binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( train_df, scaler, 5 )
 
-			pred_next_day = binary_model.predict( train_date + relativedelta( days=1 ) )
+			pred_next_day = binary_model.predict( close_vals[ train_date : train_date + timedelta(days=1) ] )
+
+			final_balance = simulator( binary_model, df.iloc[ train_date ], initial_balance, 1 )
+
 			ls_2_week_forecasts.append( pred_next_day )
 
 		ls_quarter_prices.append( ls_2_week_forecasts )
@@ -165,7 +175,6 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 #========================================================
 
 if ( __name__ == '__main__' ):
-	# test_gains( df, start_date, 3 )
 
 	tested_gains = test_quarter_forecasting( df, start_date, 3 )
-	print( f"tested gains:\n{tested_gains}" )
+	print( f"tested gains:\n{ tested_gains }" )

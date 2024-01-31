@@ -50,7 +50,7 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 
 	"""
 	:param model:			binary classification model,
-	:param df:			pandas dataframe,
+	:param df:			test data dataframe,
 	:param initial_balance:		initial balance to simulate with,
 	:param look_ahead:		steps to look ahead during predicition;
 	"""
@@ -83,9 +83,10 @@ def simulator( model, df, initial_balance : float, look_ahead : int ):
 			foreign_currency_balance -= sell_amount
 
 	final_balance = cash_balance + ( foreign_currency_balance * current_price )
-	print( f'final balance: \n{ final_balance }' )
 
-	print( f"Future prices:\n{future_prices}" )
+	if ( view_results ):
+		print( f'final balance: \n{ final_balance }' )
+		print( f"Future prices:\n{ future_prices }" )
 
 	return final_balance
 
@@ -99,4 +100,4 @@ if ( __name__ == '__main__' ):
 	bin_model = load_model( './models/bin_model.h5' )
 	print(f'df:\n{ df }')
 
-	sim_gains = simulator( bin_model, df, initial_balance, look_ahead )
+	sim_final_balance = simulator( bin_model, df, initial_balance, look_ahead )

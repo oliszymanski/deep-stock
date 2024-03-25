@@ -112,17 +112,17 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 def train_model( df, scaler, look_ahead : int ):
 	"""
 	:param scaler:		for scaling data,
-	:param look_ahead:	looking some points into the future
+	:param look_ahead:	looking some points into the future;
 
-	returns:		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
+	returns:		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class;
 	"""
 
-	df = df[ ['Close'] ]
+	df = df[ [ 'Close' ] ]
 	df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
-	df[ 'Direction' ] = np.where( df['FutureClose'] > df['Close'], 1, 0 )
+	df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
 	df = df.dropna()
 
-	X_class = df[ ['Close'] ].values
+	X_class = df[ [ 'Close' ] ].values
 	y_class = df[ 'Direction' ].values
 
 	X_class_scaled = scaler.fit_transform( X_class )
@@ -131,10 +131,12 @@ def train_model( df, scaler, look_ahead : int ):
 
 	binary_model = Sequential([
 		Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
-        	LSTM( 128, return_sequences=True ),
-        	LSTM( 64 ),
-        	Dense( 64, activation='relu' ),
-        	Dense( 1, activation='sigmoid' )
+        	LSTM( 50, return_sequences=True ),
+		Dropout( 0.2 ),
+        	LSTM( 50 ),
+		Dropout( 0.2 ),
+        	Dense( 25, activation='relu' ),
+        	Dense( look_ahead, activation='sigmoid' )
 	])
 
 	binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
@@ -152,7 +154,7 @@ def train_model( df, scaler, look_ahead : int ):
 
 if (__name__ == '__main__'):
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
-	
+
 	print( "x_test_class =\n", X_test_class )
 	y_out = binary_model.predict( X_test_class )
 	y_pred_bin = ( y_out > 0.5 ).astype( int )

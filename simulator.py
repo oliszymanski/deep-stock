@@ -5,11 +5,8 @@
 import yfinance as yf
 
 import matplotlib.pyplot as plt
-
 import numpy as np
-
 import pandas as pd
-
 from keras.models import load_model
 
 import main
@@ -22,7 +19,7 @@ from main import train_model
 #===========================================================
 
 initial_balance = 1000.0
-look_ahead = 1
+look_ahead = 5
 
 df = yf.download( 'EURPLN=X', end='2030-01-01' )		# setting up the dataframe
 df = df[ [ 'Close' ] ]

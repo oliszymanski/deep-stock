@@ -46,7 +46,7 @@ def get_column_data( df, val_00 : str , val_01 : str ):
 
 
 
-def simulator( model, df, initial_balance : float, look_ahead : int ):
+def simulator( model, df, initial_balance : float, look_ahead : int, view_results=False ):
 
 	"""
 	:param model:			binary classification model,
@@ -100,4 +100,4 @@ if ( __name__ == '__main__' ):
 	bin_model = load_model( './models/bin_model.h5' )
 	print(f'df:\n{ df }')
 
-	sim_final_balance = simulator( bin_model, df, initial_balance, look_ahead )
+	sim_final_balance = simulator( bin_model, df, initial_balance, look_ahead, view_results=True )

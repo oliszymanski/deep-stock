@@ -131,11 +131,11 @@ def train_model( df, scaler, look_ahead : int ):
 
 	binary_model = Sequential([
 		Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
-        	LSTM( 50, return_sequences=True ),
-		Dropout( 0.2 ),
-        	LSTM( 50 ),
-		Dropout( 0.2 ),
-        	Dense( 25, activation='relu' ),
+        	LSTM( 128, return_sequences=True ),
+		Dropout( 0.1 ),
+        	LSTM( 64 ),
+		Dropout( 0.1 ),
+        	Dense( 64, activation='relu' ),
         	Dense( look_ahead, activation='sigmoid' )
 	])
 

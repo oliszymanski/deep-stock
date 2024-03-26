@@ -139,6 +139,7 @@ def train_model( df, scaler, look_ahead : int ):
         	Dense( look_ahead, activation='sigmoid' )
 	])
 
+
 	binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
 	history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
 	binary_model.save( './models/bin_model.h5' )

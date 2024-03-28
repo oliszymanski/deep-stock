@@ -133,13 +133,12 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 	ls_final_balance = []
 	ls_balances = []
 
-	df = get_analyzed_df( df )			# date
+	df = get_analyzed_df( df )			# date dataframe
 	start_train_date = df.index.min()
 	end_date = df.index.max()
 	current_date = start_date
 
 	close_vals = df[ [ 'Close' ] ].values 		# values
-
 
 	while ( current_date <= end_date ):
 		forecast_date = current_date + relativedelta( months=steps )
@@ -147,7 +146,7 @@ def test_quarter_forecasting( df, start_date, steps: int, view_results=True ):
 
 		initial_balance = 10000
 
-		for day in range( 14 ):
+		for day in range( 14 ):		# because 2 weeks = 14 days
 			train_date = forecast_date + relativedelta( days=day )
 			print( f'train_date: { train_date }' )
 

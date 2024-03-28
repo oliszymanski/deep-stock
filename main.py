@@ -82,6 +82,14 @@ def create_sequences( data, target ):
 
 
 
+def display_dataset( dataset ):
+
+	print( f'dataset:\n{ dataset }' )
+
+	return
+
+
+
 def display_diagnostics( epoch_count : int, history, save_path : str ):
     for epoch in range(0, epoch_count, epoch_count):
         plt.figure(figsize=(10, 5))
@@ -118,12 +126,14 @@ def train_model( df, scaler, look_ahead : int ):
 	"""
 
 	df = df[ [ 'Close' ] ]
-	df[ 'FutureClose' ] = df[ 'Close' ].shift( -look_ahead )
-	df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
+	df[ 'Direction' ] = [ df[ 'Close' ].iloc[ i : i + look_ahead ].apply( lambda x: x> df[ 'Close' ].iloc[i] ).tolist() for i in range(len( df ) - look_ahead ) ]
+	df = df[ df[ 'Direction' ].apply(len) == look_ahead ]
 	df = df.dropna()
 
+	display_dataset( df )
+
 	X_class = df[ [ 'Close' ] ].values
-	y_class = df[ 'Direction' ].values
+	y_class = np.array( df[ 'Direction' ].tolist() )
 
 	X_class_scaled = scaler.fit_transform( X_class )
 	X_class_reshaped = X_class_scaled.reshape( -1, 1, 1 )
@@ -154,6 +164,7 @@ def train_model( df, scaler, look_ahead : int ):
 #========================================================
 
 if (__name__ == '__main__'):
+
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
 
 	print( "x_test_class =\n", X_test_class )

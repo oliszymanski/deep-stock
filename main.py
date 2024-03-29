@@ -91,23 +91,23 @@ def display_dataset( dataset ):
 
 
 def display_diagnostics( epoch_count : int, history, save_path : str ):
-    for epoch in range(0, epoch_count, epoch_count):
-        plt.figure(figsize=(10, 5))
+    for epoch in range(0, epoch_count, epoch_count ):
+        plt.figure( figsize=(10, 5) )
 
-        plt.subplot(1, 2, 1)
-        plt.plot(history.history[ 'accuracy' ], label='Training Accuracy')
-        plt.plot(history.history[ 'val_accuracy' ], label='Validation Accuracy')
-        plt.title('Training and Validation Accuracy')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
+        plt.subplot( 1, 2, 1 )
+        plt.plot( history.history[ 'accuracy' ], label='Training Accuracy')
+        plt.plot( history.history[ 'val_accuracy' ], label='Validation Accuracy')
+        plt.title( 'Training and Validation Accuracy' )
+        plt.xlabel( 'Epochs' )
+        plt.ylabel( 'Accuracy' )
         plt.legend()
 
-        plt.subplot(1, 2, 2)
+        plt.subplot( 1, 2, 2 )
         plt.plot(history.history[ 'loss' ], label='Training Loss')
         plt.plot(history.history[ 'val_loss' ], label='Validation Loss')
-        plt.title('Training and Validation Loss')
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
+        plt.title( 'Training and Validation Loss' )
+        plt.xlabel( 'Epochs' )
+        plt.ylabel( 'Loss' )
         plt.legend()
         plt.savefig( save_path )
         plt.tight_layout()
@@ -117,7 +117,37 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 
 
 
+def get_xy_classes( df, scaler, look_ahead : int, view_data=False ):
+
+	"""
+	:param df:		dataframe,
+	:param look_ahead:	number of data points into the future;
+
+	returns:		X_class, y_class;
+
+	"""
+
+	df = df[ [ 'Close' ] ]
+
+	for i in range( look_ahead ):
+		df[ f'Direction_{ i+1 }' ] = df[ 'Close' ].shift( -( i+1 ) ) > df[ 'Close' ]
+
+
+	df.dropna( inplace=True )
+
+	X_class = df[ [ 'Close' ] ].values
+	y_class = df[ [ f'Direction_{ i+1 }' for i in range( look_ahead ) ] ].values
+
+	if ( view_data ):
+		print( f'dataframe:\n{ df }' )
+		print( f'X_class:\n{ X_class }\n\ny_class:\n{ y_class }' )
+
+	return X_class, y_class
+
+
+
 def train_model( df, scaler, look_ahead : int ):
+
 	"""
 	:param scaler:		for scaling data,
 	:param look_ahead:	looking some points into the future;
@@ -125,26 +155,21 @@ def train_model( df, scaler, look_ahead : int ):
 	returns:		binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class;
 	"""
 
-	df = df[ [ 'Close' ] ]
-	df[ 'Direction' ] = [ df[ 'Close' ].iloc[ i : i + look_ahead ].apply( lambda x: x> df[ 'Close' ].iloc[i] ).tolist() for i in range(len( df ) - look_ahead ) ]
-	df = df[ df[ 'Direction' ].apply(len) == look_ahead ]
-	df = df.dropna()
+	X_class, y_class = get_xy_classes( df, scaler, look_ahead, view_data=True )
 
-	display_dataset( df )
+	print( f"X_class:\n{ X_class }" )
+	print( f"y_class:\n{ y_class }" )
 
-	X_class = df[ [ 'Close' ] ].values
-	y_class = np.array( df[ 'Direction' ].tolist() )
 
 	X_class_scaled = scaler.fit_transform( X_class )
 	X_class_reshaped = X_class_scaled.reshape( -1, 1, 1 )
+
 	X_train_class, X_test_class, y_train_class, y_test_class = train_test_split( X_class_reshaped, y_class, test_size=0.2, random_state=42 )
 
 	binary_model = Sequential([
-		Input( shape=( X_train_class.shape[-1], X_train_class.shape[2] ) ),
+		Input( shape=( X_train_class.shape[ -1 ], X_train_class.shape[ 2 ] ) ),
         	LSTM( 128, return_sequences=True ),
-		Dropout( 0.1 ),
-        	LSTM( 64 ),
-		Dropout( 0.1 ),
+		LSTM( 64 ),
         	Dense( 64, activation='relu' ),
         	Dense( look_ahead, activation='sigmoid' )
 	])
@@ -154,6 +179,8 @@ def train_model( df, scaler, look_ahead : int ):
 	history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
 	binary_model.save( './models/bin_model.h5' )
 	display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
+
+	display_dataset( df )
 
 	return binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
 
@@ -167,8 +194,11 @@ if (__name__ == '__main__'):
 
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
 
-	print( "x_test_class =\n", X_test_class )
+	print( f"x_test_class:\n{ X_test_class }" )
+	print( f"X_train_class:\n{ X_train_class }" )
+
 	y_out = binary_model.predict( X_test_class )
+	y_out = scaler.inverse_transform( y_out )
 	y_pred_bin = ( y_out > 0.5 ).astype( int )
 
 	print( f'y_out:\n{ y_out }' )

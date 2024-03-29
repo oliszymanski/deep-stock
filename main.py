@@ -28,7 +28,7 @@ display_results = False
 
 scaler = MinMaxScaler()
 
-df = yf.download( 'EURPLN=X', end="2021-01-01" )
+df = yf.download( 'EURPLN=X', end="2090-01-01" )
 
 
 
@@ -100,6 +100,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
         plt.title( 'Training and Validation Accuracy' )
         plt.xlabel( 'Epochs' )
         plt.ylabel( 'Accuracy' )
+        plt.grid()
         plt.legend()
 
         plt.subplot( 1, 2, 2 )
@@ -109,7 +110,9 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
         plt.xlabel( 'Epochs' )
         plt.ylabel( 'Loss' )
         plt.legend()
+        plt.grid()
         plt.savefig( save_path )
+
         plt.tight_layout()
         plt.show()
 

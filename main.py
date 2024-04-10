@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 
 from keras import Sequential
 from keras.layers import Input, LSTM, Dropout, Dense
+from keras.models import load_model
 
 
 
@@ -71,7 +72,26 @@ def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, displ
 
 
 
+def display_prediction_stats( df, model ):
+
+	# get prices for prediction
+	df = df[ ['Close'] ]
+
+	print( df )
+
+	# predict future prices
+	# add predicted prices to list
+	# display data from lists on data plot
+
+	plt.plot( df )
+	plt.savefig( "./img/predictions.png" )
+
+	return
+
+
+
 def create_sequences( data, target ):
+
     data_seq = []
     target_seq = []
     for i in range( len( data ) ):
@@ -195,6 +215,11 @@ def train_model( df, scaler, look_ahead : int ):
 
 if (__name__ == '__main__'):
 
+	ds_model = load_model( './models/bin_model.h5' )
+	display_prediction_stats( df, ds_model )
+
+
+	'''
 	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
 
 	print( f"x_test_class:\n{ X_test_class }" )
@@ -213,3 +238,4 @@ if (__name__ == '__main__'):
 	plt.legend()
 	plt.savefig( './img/testing_plot.png' )
 	plt.show()
+	'''

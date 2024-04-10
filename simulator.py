@@ -10,7 +10,6 @@ import pandas as pd
 from keras.models import load_model
 
 import main
-from main import train_model
 
 
 
@@ -21,7 +20,7 @@ from main import train_model
 initial_balance = 1000.0
 look_ahead = 5
 
-df = yf.download( 'EURPLN=X', end='2030-01-01' )		# setting up the dataframe
+df = yf.download( 'EURPLN=X', end='2090-01-01' )
 df = df[ [ 'Close' ] ]
 df[ 'FutureClose' ] = df[ 'Close' ].shift( -5 )
 df[ 'Direction' ] = np.where( df[ 'FutureClose' ] > df[ 'Close' ], 1, 0 )
@@ -29,7 +28,7 @@ df.dropna()
 
 df.index = pd.to_datetime( df.index )
 end_date = df.index.max()
-start_date = end_date - pd.DateOffset( months=24 )
+start_date = end_date - pd.DateOffset( months=24 )		# start predicting from the data 2 years before
 df = df.loc[ start_date : end_date ]
 
 
@@ -82,8 +81,11 @@ def simulator( model, df, initial_balance : float, look_ahead : int, view_result
 	final_balance = cash_balance + ( foreign_currency_balance * current_price )
 
 	if ( view_results ):
+		print( 'future prices:' )
+		for future_price in future_prices:
+			print( future_price )
+
 		print( f'final balance: \n{ final_balance }' )
-		print( f"Future prices:\n{ future_prices }" )
 
 	return final_balance
 
@@ -98,3 +100,4 @@ if ( __name__ == '__main__' ):
 	print(f'df:\n{ df }')
 
 	sim_final_balance = simulator( bin_model, df, initial_balance, look_ahead, view_results=True )
+

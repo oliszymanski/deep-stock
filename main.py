@@ -72,18 +72,24 @@ def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, displ
 
 
 
-def display_prediction_stats( df, model ):
+def display_prediction_stats( df, scaler, model ):
 
 	# get prices for prediction
-	df = df[ ['Close'] ]
+	close_values = df[[ 'Close' ]].values.reshape( -1, 1 )
+	close_values_scaled = scaler.transform( close_values )
 
-	print( df )
+	print( close_values )
 
 	# predict future prices
-	# add predicted prices to list
+	predictions = model.predict( close_values_scaled )
+	predictions = scaler.inverse_transform( predictions )
+
+	# add predicted prices to column
+	df[ 'PredictedClose' ] = predictions
+
 	# display data from lists on data plot
 
-	plt.plot( df )
+	plt.plot( close_values )
 	plt.savefig( "./img/predictions.png" )
 
 	return
@@ -169,7 +175,7 @@ def get_xy_classes( df, scaler, look_ahead : int, view_data=False ):
 
 
 
-def train_model( df, scaler, look_ahead : int ):
+def train_model( df, scaler, look_ahead : int, train_model=True ):
 
 	"""
 	:param scaler:		for scaling data,
@@ -198,14 +204,17 @@ def train_model( df, scaler, look_ahead : int ):
 	])
 
 
-	binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
-	history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
-	binary_model.save( './models/bin_model.h5' )
-	display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
+	if ( train_model ):
+		binary_model.compile( optimizer='adam', loss='binary_crossentropy', metrics=[ 'accuracy' ] )
+		history = binary_model.fit( X_train_class, y_train_class, batch_size=64, epochs=epochs, validation_data=( X_test_class, y_test_class ) )
+		binary_model.save( './models/bin_model.h5' )
+		display_diagnostics( epochs, history, "./img/diagnostics_plot.png" )
 
-	display_dataset( df )
+		display_dataset( df )
 
-	return binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
+		return binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class
+
+	return binary_model, X_train_class, X_test_class, y_train_class, y_test_class
 
 
 
@@ -215,13 +224,16 @@ def train_model( df, scaler, look_ahead : int ):
 
 if (__name__ == '__main__'):
 
+	binary_model, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead, train_model=False )
+
+	X_train_class = X_train_class.reshape( -1, X_train_class.shape[ -1 ] )
+
+	scaler.fit( X_train_class )
 	ds_model = load_model( './models/bin_model.h5' )
-	display_prediction_stats( df, ds_model )
+	display_prediction_stats( df, scaler, ds_model )
 
 
 	'''
-	binary_model, history, X_train_class, X_test_class, y_train_class, y_test_class = train_model( df, scaler, look_ahead=look_ahead )
-
 	print( f"x_test_class:\n{ X_test_class }" )
 	print( f"X_train_class:\n{ X_train_class }" )
 

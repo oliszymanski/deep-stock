@@ -85,7 +85,7 @@ def simulator( model, df, initial_balance : float, look_ahead : int, view_result
 		for future_price in future_prices:
 			print( future_price )
 
-		print( f'final balance: \n{ final_balance }' )
+		print( f'\n\nfinal balance: \n{ final_balance }' )
 
 	return final_balance
 

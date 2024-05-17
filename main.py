@@ -21,7 +21,9 @@ from keras.models import load_model
 #	GLOBALS
 #=======================================================
 
-look_ahead = 5
+look_back = 90
+look_ahead = 10
+
 epochs = 1000
 
 display_training = False
@@ -74,25 +76,20 @@ def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, displ
 
 def display_prediction_stats( df, scaler, model ):
 
-	# get prices for prediction
+
 	close_values = df[[ 'Close' ]].values.reshape( -1, 1 )
 	close_values_scaled = scaler.transform( close_values )
-
 	print( close_values )
 
-	# predict future prices
 	predictions = model.predict( close_values_scaled )
 	predictions = scaler.inverse_transform( predictions )
 
-	# add predicted prices to column
 	df[ 'PredictedClose' ] = predictions
-
-	# display data from lists on data plot
 
 	plt.plot( close_values )
 	plt.savefig( "./img/predictions.png" )
 
-	return
+	return df
 
 
 
@@ -146,7 +143,7 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 
 
 
-def get_xy_classes( df, scaler, look_ahead : int, view_data=False ):
+def get_xy_classes( df, look_back : int, view_data=False ):
 
 	"""
 	:param df:		dataframe,
@@ -158,18 +155,23 @@ def get_xy_classes( df, scaler, look_ahead : int, view_data=False ):
 
 	df = df[ [ 'Close' ] ]
 
-	for i in range( look_ahead ):
-		df[ f'Direction_{ i+1 }' ] = df[ 'Close' ].shift( -( i+1 ) ) > df[ 'Close' ]
+	X_class = []
+	y_class = []
 
-
+	df[ 'Direction' ] = ( df[ 'close' ].shift(-1) > df[ 'Close' ] ).astype( int )
 	df.dropna( inplace=True )
 
-	X_class = df[ [ 'Close' ] ].values
-	y_class = df[ [ f'Direction_{ i+1 }' for i in range( look_ahead ) ] ].values
+	for i in range( len( df ) - look_back - 1 ):
+		X_class.append( df[ 'Close' ][ i : ( i+look_back )].values )
+		y_class.append( df[ 'Direction' ][ i + look_back ] )
+
+	X_class = np.array( X_class )
+	y_class = np.array( y_class )
+
 
 	if ( view_data ):
 		print( f'dataframe:\n{ df }' )
-		print( f'X_class:\n{ X_class }\n\ny_class:\n{ y_class }' )
+		print( f'X_class:\n{ X_class }\n length:{ len(X_class) }\ny_class:\n{ y_class }\nlength: { len( y_class ) }' )
 
 	return X_class, y_class
 

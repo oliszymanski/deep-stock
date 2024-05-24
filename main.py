@@ -25,13 +25,15 @@ look_back = 90
 look_ahead = 10
 
 epochs = 1000
+scaler = MinMaxScaler()
+
+df = yf.download( "EURPLN=X", end="2090-01-01" )
+start_date = datetime( 2021, 1, 1 )
 
 display_training = False
 display_results = False
 
-scaler = MinMaxScaler()
-
-df = yf.download( 'EURPLN=X', end="2090-01-01" )
+test_quarter_gains = {}
 
 
 

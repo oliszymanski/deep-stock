@@ -54,7 +54,7 @@ def show_data_plot( data, label : str, display_data=True ):
 
 def show_two_data_plots( data_01, data_02, label_01 : str, label_02 : str, display_data=True ):
 
-    fig, axs = plt.subplots(2)
+    fig, axs = plt.subplots( 2 )
 
     if ( display_data ):
         print( label_01, "=", data_01 )
@@ -143,37 +143,43 @@ def display_diagnostics( epoch_count : int, history, save_path : str ):
 
 
 
-def get_xy_classes( df, look_back : int, view_data=False ):
+def get_xy_classes( df, look_back : int, view_data=True ):
 
 	"""
-	:param df:		dataframe,
-	:param look_ahead:	number of data points into the future;
+	:param df:              dataframe,
+	:look_back:             number of data considered when making a prediction,
+	:param look_ahead:      number of data points to look into the future;
 
-	returns:		X_class, y_class;
+	returns:                X_class, y_class;
 
 	"""
 
 	df = df[ [ 'Close' ] ]
-
 	X_class = []
 	y_class = []
 
-	df[ 'Direction' ] = ( df[ 'close' ].shift(-1) > df[ 'Close' ] ).astype( int )
-	df.dropna( inplace=True )
+	df[ 'Direction' ] = ( df[ 'Close' ].shift(-1) > df[ 'Close' ] ).astype( int )
+	df.dropna( inplace=True )   # last column
 
 	for i in range( len( df ) - look_back - 1 ):
 		X_class.append( df[ 'Close' ][ i : ( i+look_back )].values )
 		y_class.append( df[ 'Direction' ][ i + look_back ] )
 
+
 	X_class = np.array( X_class )
 	y_class = np.array( y_class )
+	y_class = y_class.reshape( -1, 1 )
 
+	if ( len( X_class ) == len( y_class ) ): print( "lengths match" )
+	else: print( "lengths dont match" )
 
 	if ( view_data ):
-		print( f'dataframe:\n{ df }' )
-		print( f'X_class:\n{ X_class }\n length:{ len(X_class) }\ny_class:\n{ y_class }\nlength: { len( y_class ) }' )
+			print( f'dataframe:\n{ df }' )
+			print( f'X_class:\n{ X_class }\n length:{ len(X_class) }\ny_class:\n{ y_class }\nlength: { len( y_class ) }' )
 
-	return X_class, y_class
+	print( f'X_class shape: { X_class.shape }\ny_class shape: { y_class.shape }' )
+
+	return  X_class, y_class
 
 
 

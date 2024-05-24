@@ -196,8 +196,16 @@ def train_model( df, scaler, look_ahead : int, train_model=True ):
 
 	X_class, y_class = get_xy_classes( df, scaler, look_ahead, view_data=True )
 
-	print( f"X_class:\n{ X_class }" )
-	print( f"y_class:\n{ y_class }" )
+	X_class_scaled = scaler.fit_transform( X_class )            # X_class
+	X_class_reshaped = X_class_scaled.reshape( X_class_scaled.shape[ 0 ] , X_class_scaled.shape[ 1 ] , 1 )
+	print( f'X_class_scaled shape: { X_class_scaled.shape } ' )
+	print( f'X_class_reshaped shape: { X_class_reshaped.shape }' )
+    
+    
+	y_class_scaled = scaler.fit_transform( y_class )            # y_class
+	y_class_reshaped = y_class_scaled.reshape( -1, 1, 1 )
+	print( f'y_class_scaled shape: { y_class_scaled.shape } ' )
+	print( f'y_class_reshaped shape: { y_class_reshaped.shape }' )
 
 
 	X_class_scaled = scaler.fit_transform( X_class )
